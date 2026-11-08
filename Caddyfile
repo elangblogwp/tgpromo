@@ -1,0 +1,13 @@
+{
+	default_sni {$PUBLIC_IP}
+}
+
+{$PUBLIC_BASE_URL} {
+	tls {
+		issuer acme {
+			dir https://acme-v02.api.letsencrypt.org/directory
+			profile shortlived
+		}
+	}
+	reverse_proxy userbot:8080
+}

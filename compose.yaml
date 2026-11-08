@@ -1,0 +1,40 @@
+services:
+  userbot:
+    build: .
+    init: true
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      BIND_HOST: 0.0.0.0
+      DATA_DIR: /app/data
+      PORT: 8080
+    volumes:
+      - userbot-data:/app/data
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    stop_grace_period: 60s
+  caddy:
+    image: caddy:2.11.8-alpine
+    restart: unless-stopped
+    environment:
+      PUBLIC_IP: ${PUBLIC_IP}
+      PUBLIC_BASE_URL: ${PUBLIC_BASE_URL}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      - userbot
+volumes:
+  userbot-data:
+  caddy-data:
+  caddy-config:
